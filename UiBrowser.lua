@@ -418,17 +418,23 @@ function UiBrowser:new()
 	self
 		:sizepx(500,500)
 		:decorate{ DecoFrame(framecolor, nil, 5) }
-		:padding(-2) -- Remove frame padding
-		:registerDragResize(5, 200)
+		:registerDragResize(5, 500)
 		:beginUi(UiWeightLayout)
 			:size(1,1)
-			:padding(5)
 			:setVar("translucent", true)
 			-- Draggable Header
 			:beginUi(self.header)
 				:width(1):heightpx(40)
+				:padding(0)
 				:setVar("translucent", true)
-				:decorate{ DecoSolid(buttoncolor) }
+				:decorate{
+					DecoSolid(buttoncolor),
+					DecoText(
+						"Ui Inspector",
+						deco.uifont.title.font,
+						deco.uifont.title.set
+					)
+				}
 			:endUi()
 			-- Back Buttons
 			:beginUi(self.backButtons)
@@ -445,7 +451,7 @@ function UiBrowser:new()
 				:orientation(modApi.constants.ORIENTATION_HORIZONTAL)
 				-- Left scrollarea
 				:beginUi(UiScrollArea)
-					:size(0.5,1)
+					:size(0.2,1)
 					-- navButtons
 					:beginUi(self.navButtons)
 						:size(1,1)
@@ -454,7 +460,7 @@ function UiBrowser:new()
 				:endUi()
 				-- Right scrollarea
 				:beginUi(UiScrollArea)
-					:size(0.5,1)
+					:size(0.8,1)
 					:beginUi(self.outputBox)
 						:size(1,1)
 						:vgap(4)
@@ -542,9 +548,10 @@ function UiBrowser:new()
 		:endUi()
 end
 
-function UiBrowser:mousemove(mx, my)
-	local result = Ui.mousemove(self, mx, my)
+function UiBrowser:updateState()
+	local mx, my = sdl.mouse.x(), sdl.mouse.y()
 
+	-- Make object both draggable and resizable
 	if true
 		and not self.dragResizing
 		and not self.dragMoving
@@ -569,7 +576,7 @@ function UiBrowser:mousemove(mx, my)
 		end
 	end
 
-	return result
+	Ui.updateState(self)
 end
 
 function UiBrowser:inspectObject(inspectedObject)
