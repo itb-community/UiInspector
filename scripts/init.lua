@@ -49,8 +49,6 @@ function mod:init(options)
 		uiRoot.priorityUi:add(UiDebug(getDragHoveredChild, sdl.rgb(255, 100, 100)))
 		uiRoot.priorityUi:add(UiDebug(getIndirectHoveredChild, sdl.rgb(100, 255, 255)))
 		uiRoot.priorityUi:add(uiBrowser)
-
-		uiBrowser:inspectObject(sdlext.getUiRoot())
 	end)
 end
 
