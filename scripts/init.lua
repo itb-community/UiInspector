@@ -10,12 +10,18 @@ function mod:init(options)
 
 	local UiDebug = require(path.."UiDebug")
 	local UiBrowser = require(path.."UiBrowser")
-	local uiBrowser = UiBrowser()
+	local uiBrowser
 
 	uiInspector = {
 		highlightMode = "indirectHighlight",
-		browser = uiBrowser,
+		highlightInspectedUi = false,
+		inspectCustomTooltip = false,
+		filterOutFunctions = true,
+		filterOutTables = false,
 	}
+
+	uiBrowser = UiBrowser()
+	uiInspector.browser = uiBrowser
 
 	local function getHoveredChild(self, root)
 		if uiInspector.highlightMode == "directHighlight" then
@@ -44,7 +50,7 @@ function mod:init(options)
 		uiRoot.priorityUi:add(UiDebug(getIndirectHoveredChild, sdl.rgb(100, 255, 255)))
 		uiRoot.priorityUi:add(uiBrowser)
 
-		uiBrowser.navCurrent = sdlext.getUiRoot()
+		uiBrowser:inspectObject(sdlext.getUiRoot())
 	end)
 end
 

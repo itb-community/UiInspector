@@ -9,6 +9,18 @@ local FONT = sdlext.font("fonts/NunitoSans_Bold.ttf", 18)
 local COLOR_HOVER = sdl.rgba(196,196,196,32)
 
 
+local DecoHighlight = Class.inherit(DecoSolid)
+function DecoHighlight:new(...)
+	DecoSolid.new(self, ...)
+end
+
+function DecoHighlight:draw(screen, widget)
+	if uiInspector.highlightInspectedUi then
+		DecoSolid.draw(self, screen, widget)
+	end
+end
+
+
 local UiDebug = Class.inherit(Ui)
 function UiDebug:new(getWatchedElement, color)
 	Ui.new(self)
@@ -26,7 +38,7 @@ function UiDebug:new(getWatchedElement, color)
 
 	self:decorate{
 		DecoOutline(color, 4),
-		DecoSolid(COLOR_HOVER),
+		DecoHighlight(COLOR_HOVER),
 		DecoAlign(-4,-4),
 		self.decoText,
 	}
