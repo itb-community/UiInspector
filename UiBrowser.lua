@@ -232,10 +232,11 @@ end
 function UiOutputBox:insertSort(key, value)
 	local children = self.children
 	local function getValue(i)
-		return children[i].key
+		local child = children[i]
+		return child and child.key or tostring(INT_MAX)
 	end
 
-	local index = BinarySearch(key, 1, #children, getValue, "up")
+	local index = BinarySearch(key, 1, #children + 1, getValue, "up")
 	local obj = UiOutputField(key, value)
 		:width(1):heightpx(40)
 
