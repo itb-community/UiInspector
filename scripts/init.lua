@@ -3,6 +3,8 @@ local mod = {
 	id = "uiInspector",
 	name = "Ui Inspector",
 	version = "0.1.0",
+	modApiVersion = "2.7.3dev",
+	gameVersion = "1.2.83",
 }
 
 function mod:init(options)
