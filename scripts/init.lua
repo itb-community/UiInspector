@@ -5,6 +5,8 @@ local mod = {
 	version = "0.1.0",
 	modApiVersion = "2.7.3dev",
 	gameVersion = "1.2.83",
+	isExtension = true,
+	enabled = false,
 }
 
 function mod:init(options)
@@ -15,34 +17,46 @@ function mod:init(options)
 	local uiBrowser
 
 	uiInspector = {
-		highlightMode = "indirectHighlight",
-		highlightInspectedUi = false,
+		highlightInspectedUi = true,
 		inspectCustomTooltip = false,
 		filterOutFunctions = true,
 		filterOutTables = false,
+		selectFocusedElement = false,
+		highlightSelf = false,
 	}
 
 	uiBrowser = UiBrowser()
 	uiInspector.browser = uiBrowser
 
+	local function hasAncestor(self, ancestor)
+		local parent = self
+
+		while parent do
+			if parent == ancestor then
+				return true
+			end
+			parent = parent.parent
+		end
+
+		return false
+	end
+
 	local function getHoveredChild(self, root)
-		if uiInspector.highlightMode == "directHighlight" then
+		if not hasAncestor(root.hoveredchild, uiBrowser) then
 			return root.hoveredchild
 		end
 	end
 
 	local function getDragHoveredChild(self, root)
-		if uiInspector.highlightMode == "directHighlight" then
+		if not hasAncestor(root.draghoveredchild, uiBrowser) then
 			return root.draghoveredchild
 		end
 	end
 
 	local function getIndirectHoveredChild(self, root)
-		if uiInspector.highlightMode == "indirectHighlight" then
-			local hoveredchild = root.hoveredchild
-			if hoveredchild then
-				return hoveredchild.target
-			end
+		local hoveredchild = root.hoveredchild
+		if hasAncestor(hoveredchild, uiBrowser) then
+			return hoveredchild.target
 		end
 	end
 
@@ -51,6 +65,7 @@ function mod:init(options)
 		uiRoot.priorityUi:add(UiDebug(getDragHoveredChild, sdl.rgb(255, 100, 100)))
 		uiRoot.priorityUi:add(UiDebug(getIndirectHoveredChild, sdl.rgb(100, 255, 255)))
 		uiRoot.priorityUi:add(uiBrowser)
+		uiRoot.priorityUi:add(uiBrowser.clickDetector)
 	end)
 end
 

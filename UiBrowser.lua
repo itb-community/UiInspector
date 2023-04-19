@@ -17,11 +17,11 @@ local function getCheckboxSurfaces()
 		deco.surfaces.checkboxHoveredUnchecked
 end
 
-local function onclicked_highlightMode(self, button)
+local function onclicked_highlightSelf(self, button)
 	if self.checked then
-		uiInspector.highlightMode = "indirectHighlight"
+		uiInspector.highlightSelf = true
 	else
-		uiInspector.highlightMode = "directHighlight"
+		uiInspector.highlightSelf = false
 	end
 
 	return true
@@ -55,6 +55,12 @@ local function onclicked_filterOutTables(self, button)
 	if uiInspector.filterOutTables then
 		uiInspector.browser.outputBox:filterOut("table")
 	end
+
+	return true
+end
+
+local function onclicked_selectFocusedElement(self, button)
+	uiInspector.selectFocusedElement = self.checked
 
 	return true
 end
@@ -403,6 +409,28 @@ function UiOutputField:onEnter()
 	UiInputField.onEnter(self)
 end
 
+-- //////////////////////////////////////////////
+UiClickDetector = Class.inherit(Ui)
+function UiClickDetector:new()
+	Ui.new(self)
+	self:size(1,1)
+	self.translucent = true
+end
+
+function UiClickDetector:mousedown(mx, my, button)
+	if true
+		-- and button == 1
+		and self.root.focuschild
+		and uiInspector.selectFocusedElement
+	then
+		uiInspector.browser:inspectObject(self.root.focuschild)
+
+		return true
+	end
+
+	return false
+end
+
 
 -- //////////////////////////////////////////////
 UiBrowser = Class.inherit(Ui)
@@ -415,6 +443,7 @@ function UiBrowser:new()
 	self.navButtons = UiNavButtonBox()
 	self.backButtons = UiBackButtonBox()
 	self.outputBox = UiOutputBox()
+	self.clickDetector = UiClickDetector()
 
 	self
 		:sizepx(500,500)
@@ -477,20 +506,6 @@ function UiBrowser:new()
 				:orientation(modApi.constants.ORIENTATION_HORIZONTAL)
 				:beginUi(UiCheckbox)
 					:heightpx(40)
-					:setVar("onclicked", onclicked_highlightMode)
-					:setVar("checked", uiInspector.highlightMode)
-					:settooltip("Checked: Highlight the target of objects under the mouse cursor\nUnchecked: Highlight objects under the mouse cursor")
-					:decorate{
-						DecoButton(framecolor, bordercolor),
-						DecoText("Hover Mode"),
-						DecoAnchor("right"),
-						DecoAlign(-40),
-						DecoCheckbox(getCheckboxSurfaces()),
-					}
-					:format(updateWidth, 2, 52)
-				:endUi()
-				:beginUi(UiCheckbox)
-					:heightpx(40)
 					:setVar("onclicked", onclicked_highlightInspectedUi)
 					:setVar("checked", uiInspector.highlightInspectedUi)
 					:settooltip("Highlight hovered ui objects")
@@ -539,6 +554,34 @@ function UiBrowser:new()
 					:decorate{
 						DecoButton(framecolor, bordercolor),
 						DecoText("Filter out tables"),
+						DecoAnchor("right"),
+						DecoAlign(-40),
+						DecoCheckbox(getCheckboxSurfaces()),
+					}
+					:format(updateWidth, 2, 52)
+				:endUi()
+				:beginUi(UiCheckbox)
+					:heightpx(40)
+					:setVar("onclicked", onclicked_selectFocusedElement)
+					:setVar("checked", uiInspector.selectFocusedElement)
+					:settooltip("Select focused element")
+					:decorate{
+						DecoButton(framecolor, bordercolor),
+						DecoText("Select focused element"),
+						DecoAnchor("right"),
+						DecoAlign(-40),
+						DecoCheckbox(getCheckboxSurfaces()),
+					}
+					:format(updateWidth, 2, 52)
+				:endUi()
+				:beginUi(UiCheckbox)
+					:heightpx(40)
+					:setVar("onclicked", onclicked_highlightSelf)
+					:setVar("checked", uiInspector.highlightSelf)
+					:settooltip("Highlight ui elements in UiInspector")
+					:decorate{
+						DecoButton(framecolor, bordercolor),
+						DecoText("Hover Self"),
 						DecoAnchor("right"),
 						DecoAlign(-40),
 						DecoCheckbox(getCheckboxSurfaces()),
